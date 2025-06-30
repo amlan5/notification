@@ -2,6 +2,7 @@ package com.notification.service.kafka;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,9 @@ public class NotificationConsumer {
     @Autowired
     EmailNotificationService emailNotificationService;
 
+    @Value("${consumer.email.id}")
+    private String consumerEmail;
+
     @KafkaListener(topics = "users-notifications", groupId = "notification-group")
     public void consume(NotificationEvent event) {
         log.info("Received notification event: {}", event);
@@ -26,7 +30,7 @@ public class NotificationConsumer {
             Map<String, Object> params = new HashMap<>();
             params.put("email", event.getEmail());
             params.put("name", event.getName());
-            emailNotificationService.sendEmail("imamlanspd@gmail.com", event.getName(), 1L, params);
+            emailNotificationService.sendEmail(consumerEmail, event.getName(), 1L, params);
         }
     }
 }
